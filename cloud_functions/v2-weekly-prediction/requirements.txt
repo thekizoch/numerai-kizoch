@@ -1,0 +1,2 @@
+numerapi==2.8.1
+google-cloud-bigquery==1.21.0
