@@ -39,6 +39,8 @@ def trickle_in_fnc():
     l = []
     # empty list to hold sharpe ratio of weekly returns
     l_sharpe = []
+    # empty list to hold models to remove
+    l_models_to_use = []
 
     # load each model from list
     for model_name in list_model_names:
@@ -67,6 +69,7 @@ def trickle_in_fnc():
       s = df.ewm(alpha=alpha).mean()['sum_corr_mmc_with_multipliers']
 
       # add to list of possible winners and losers
+      l_models_to_use.append(model_name)
       l.append(s)
       l_sharpe.append(s.mean()/s.std())
       ###END loop
@@ -75,7 +78,7 @@ def trickle_in_fnc():
     ll = []
     for i, s in enumerate(l):
       s = s.to_frame().rename(columns={'sum_corr_mmc_with_multipliers':
-                                       list_model_names[i]})
+                                       l_models_to_use[i]})
       ll.append(s)
 
     df = pd.concat(ll, axis=1)
