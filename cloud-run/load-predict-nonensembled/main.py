@@ -36,7 +36,7 @@ def start_v1():
 @app.route("/start_v2", methods=['POST'])
 def start_v2():
     download_v2()
-    print('func download_v1 successful')
+    print('func download_v2 successful')
     load_into_bq_v2()
     print('func load_into_bq_v2 successful')
     add_mapping_v2()
