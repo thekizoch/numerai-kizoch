@@ -84,6 +84,11 @@ def submit_bq_submissions_v1():
     secret_key = os.getenv('SECRET_KEY')
     napi = numerapi.NumerAPI(public_id=public_id, secret_key=secret_key)
 
+    # authenticate licensed
+    public_id_licensed = "D54UD674E4IVRZF3B6FZHDVAPUI46WKM"
+    secret_key_licensed = os.getenv('SECRET_KEY_LICENSED')
+    napi_licensed = numerapi.NumerAPI(public_id=public_id_licensed, secret_key=secret_key_licensed)
+
     # define MODEL_NAME's and MODEL_ID's
     bqclient = bigquery.Client()
 
@@ -126,6 +131,12 @@ def submit_bq_submissions_v1():
         # local path
         file_path_submission = "/tmp/submission_{}.csv".format(MODEL_NAME)
 
+        # authenticate
+        public_id = "HSOL3P7JYNV3D7IXEU56H26NXN7JETDO"
+        secret_key = os.getenv('SECRET_KEY')
+        napi = numerapi.NumerAPI(public_id=public_id, secret_key=secret_key)
+
+
         # submit
         submission_id = napi.upload_predictions(file_path_submission, \
                                                 model_id=MODEL_ID, \
@@ -133,5 +144,16 @@ def submit_bq_submissions_v1():
 
         print("The submission_id is {} for model {}".format(submission_id, \
                                                             MODEL_NAME))
+
+        # submit 1_thekizoch to licensed model
+        if MODEL_NAME == '1_thekizoch':
+            model_id_licensed = '11bcac5c-b3d8-4456-a2a1-633eca3f72c1'
+            submission_id_licensed = napi_licensed.upload_predictions(file_path_submission, \
+                                                                    model_id=model_id_licensed, \
+                                                                    version=model_version)
+
+            print("The submission_id_licensed is {} for model {}".format(submission_id_licensed, \
+                                                                MODEL_NAME))
+
         # remove local submission file to recover memory
         os.remove(file_path_submission)

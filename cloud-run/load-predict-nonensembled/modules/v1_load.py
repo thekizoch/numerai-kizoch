@@ -5,6 +5,8 @@ import pandas as pd
 import os
 import shutil
 import numerapi
+import time
+
 
 
 # function to upload from local disk to GCS using python API
@@ -36,11 +38,9 @@ def download_v1():
     bqclient = bigquery.Client(project='numerai-kizoch')
     print('instantiated numerai client')
 
-    table_id = "numerai-kizoch.data.tournament_data"
-    bqclient.delete_table(table_id, not_found_ok=True)  # Make an API request.
-
-    print("Deleted table '{}'.".format(table_id))
-    logging.info("Deleted table '{}'.".format(table_id))
+    # not deleting, overwriting in load function
+    #table_id = "numerai-kizoch.data.tournament_data"
+    #bqclient.delete_table(table_id, not_found_ok=True)  # Make an API request.
 
     # download tournament data v1
     current_round = napi.get_current_round()
@@ -83,8 +83,10 @@ def load_into_bq_v1():
     file_path_tournament = f"tmp/numerai_v1_tournament_data_{current_round}.parquet"
     uri_parquet = "gs://numerai-kizoch/" + file_path_tournament
 
-    # load tournament parquet into BQ
+
+    # load tournament parquet into BQ, overwrite if any is there
     table_id = "numerai-kizoch.data.tournament_data"
+    print(f'running bigquery job to overwrite {table_id }')
 
     job_config = bigquery.LoadJobConfig(source_format=bigquery.SourceFormat.PARQUET, \
                                         write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE)
@@ -96,6 +98,8 @@ def load_into_bq_v1():
 
     # wait for job to complete
     load_job.result()
+    print(f'loaded v1 tournament data into {table_id}. Now waiting 15 seconds')
+    time.sleep(15)
 
 
 
@@ -121,7 +125,7 @@ def add_mapping_v1():
     table = bqclient.update_table(table, ["schema"])  # Make an API request.
 
     if len(table.schema) == len(original_schema) + 1 == len(new_schema):
-        print("A new column has been added.")
+        print("A new column has been added.") #
     else:
         print("The column has not been added.")
 
@@ -136,6 +140,7 @@ def add_mapping_v1():
         skip_leading_rows=1,
         # The source format defaults to CSV, so the line below is optional.
         source_format=bigquery.SourceFormat.CSV,
+        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
     )
 
     uri = uri_csv
@@ -163,9 +168,3 @@ def add_mapping_v1():
     table_id = "numerai-kizoch.data.temp"
     bqclient.delete_table(table_id, not_found_ok=True)  # Make an API request.
     print("Deleted table '{}'.".format(table_id))
-
-
-
-
-
-
