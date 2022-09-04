@@ -78,11 +78,6 @@ def submit_bq_submissions_v2():
     CURRENT_ROUND = numerapi.NumerAPI().get_current_round()
     model_version = 2
 
-    # authentication
-    public_id = "HSOL3P7JYNV3D7IXEU56H26NXN7JETDO"
-    secret_key = os.getenv('SECRET_KEY')
-    napi = numerapi.NumerAPI(public_id=public_id, secret_key=secret_key)
-
     # define MODEL_NAME's and MODEL_ID's
     bqclient = bigquery.Client()
 
@@ -124,6 +119,11 @@ def submit_bq_submissions_v2():
 
         # local path
         file_path_submission = f"/tmp/submission_{MODEL_NAME}.csv"
+
+        # authentication
+        public_id = "HSOL3P7JYNV3D7IXEU56H26NXN7JETDO"
+        secret_key = os.getenv('SECRET_KEY')
+        napi = numerapi.NumerAPI(public_id=public_id, secret_key=secret_key)
 
         # submit
         submission_id = napi.upload_predictions(file_path_submission, \

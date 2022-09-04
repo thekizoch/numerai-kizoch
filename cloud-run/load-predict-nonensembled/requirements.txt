@@ -6,3 +6,4 @@ google-cloud-storage==1.18.1
 google-cloud-bigquery==1.21.0
 google-cloud-pubsub==2.8.0
 pyarrow==3.0.0
+protobuf==3.20.*
